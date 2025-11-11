@@ -60,12 +60,12 @@ export default function WaitlistModal() {
           animate={{ height }}
           className={cn(
             "relative flex w-full max-w-[500px] flex-col overflow-hidden rounded-2xl bg-black will-change-transform",
-            "shadow-[0px_0px_0px_1px_rgba(0,0,0,0.10),0px_12px_24px_-6px_rgba(51,51,51,0.03),0px_8px_16px_-4px_rgba(51,51,51,0.03),0px_4px_8px_-2px_rgba(51,51,51,0.03),0px_2px_4px_-0.5px_rgba(51,51,51,0.03)]"
+            "shadow-[0px_0px_0px_1px_rgba(0,0,0,0.10),0px_12px_24px_-6px_rgba(51,51,51,0.03),0px_8px_16px_-4px_rgba(51,51,51,0.03),0px_4px_8px_-2px_rgba(51,51,51,0.03),0px_2px_4px_-0.5px_rgba(51,51,51,0.03)]",
+            `w-full max-w-md m-1`
           )}
           layoutId="modal-cta"
           exit="none"
           style={{
-            width: isOpen ? "450px" : "auto",
             transformOrigin: "bottom center",
           }}
         >
