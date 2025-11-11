@@ -1,7 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
-
+import { FormEvent, useRef, useState } from "react";
 import { MotionConfig, motion } from "motion/react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
@@ -12,7 +11,6 @@ import { Checkbox } from "@radix-ui/react-checkbox";
 import { Label } from "@radix-ui/react-label";
 import Link from "next/link";
 import { Input } from "../ui/input";
-import { Spinnaker } from "next/font/google";
 import { Spinner } from "../ui/spinner";
 
 const STATE = ["initial", "loading", "success", "error"] as const;
@@ -22,17 +20,37 @@ export default function WaitlistModal() {
   const ref = useRef(null);
   const { height } = useMeasure({ ref });
   const [state, setState] = useState<(typeof STATE)[number]>("initial");
+  const [phone, setPhone] = useState("");
+  const [agreed, setAgreed] = useState(true);
 
-  const sendCode = () => {
-    // send code logic here
-    // wait 5 sec each step
+  // Instead of sending, on submit just collapse the modal
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (phone.length < 10) {
+      setState("error");
+      alert("Please enter a valid phone number.");
+      return;
+    }
+
+    if (!agreed) {
+      setState("error");
+      alert("Please agree to the terms.");
+      return;
+    }
+
     setState("loading");
+
+    // Simulate an API call delay
     setTimeout(() => {
       setState("success");
+      // After showing success, collapse modal
       setTimeout(() => {
         setState("initial");
-      }, 3000);
-    }, 5000);
+        setPhone("");
+        setAgreed(false);
+      }, 1500);
+    }, 2000);
   };
 
   return (
@@ -64,33 +82,29 @@ export default function WaitlistModal() {
                   if (!isOpen) setIsOpen(true);
                 }}
               >
-                {/* header part with close button */}
                 <div className="w-full flex items-center justify-between">
                   <motion.span
                     layout
                     exit="none"
-                    layoutId="modal-cta-text px-4 inline-block cursor-pointer py-2"
+                    className="px-4 inline-block cursor-pointer py-2"
+                    layoutId="modal-cta-text"
                   >
                     Join Waitlist
                   </motion.span>
                   {isOpen && (
-                    <Button
-                      onClick={() => setIsOpen(false)}
-                      variant={"outline"}
-                    >
+                    <Button onClick={() => setIsOpen(false)} variant="outline">
                       <XIcon />
                     </Button>
                   )}
                 </div>
 
                 {isOpen && (
-                  <motion.div
+                  <motion.form
+                    onSubmit={handleSubmit}
                     initial={{ opacity: 0, filter: "blur(2px)" }}
                     animate={{ opacity: 1, filter: "blur(0px)" }}
                     exit={{ opacity: 0, filter: "blur(2px)" }}
-                    transition={{
-                      delay: 0.05,
-                    }}
+                    transition={{ delay: 0.05 }}
                     className="py-6 pb-0 flex flex-col gap-8"
                   >
                     <p>Enter your phone to get a verification code.</p>
@@ -103,35 +117,45 @@ export default function WaitlistModal() {
                           width={20}
                           height={20}
                         />
-                        <span className="">+1</span>
+                        <span>+1</span>
                       </div>
 
                       <Input
                         placeholder="(212) 555-1234"
                         className="flex-1 py-5 text-lg"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        disabled={state === "loading" || state === "success"}
                       />
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <Checkbox id="agreement" />
-                      <Label htmlFor="agreement">
-                        <p className="text-gray-500 tracking-tight">
-                          By continuing, you agree to receive a one-time
-                          passcode and onboarding texts from Moshi. Msg & data
-                          rates may apply. Reply STOP to opt out, HELP for help.
-                          See our{" "}
-                          <Link
-                            target="_blank"
-                            href={"http://www.google.com"}
-                            className="underline"
-                          >
-                            SMS Terms & Conditions
-                          </Link>
-                        </p>
+                      <Checkbox
+                        id="agreement"
+                        checked={agreed}
+                        onCheckedChange={(checked) =>
+                          setAgreed(checked === true)
+                        }
+                        disabled={state === "loading" || state === "success"}
+                      />
+                      <Label
+                        htmlFor="agreement"
+                        className="text-gray-500 tracking-tight"
+                      >
+                        By continuing, you agree to receive a one-time passcode
+                        and onboarding texts from Moshi. Msg & data rates may
+                        apply. Reply STOP to opt out, HELP for help. See our{" "}
+                        <Link
+                          target="_blank"
+                          href="http://www.google.com"
+                          className="underline"
+                        >
+                          SMS Terms & Conditions
+                        </Link>
+                        .
                       </Label>
                     </div>
 
-                    {/* bottom ctas */}
                     <div className="w-full flex items-center justify-between space-x-2">
                       <Button
                         disabled={state === "loading" || state === "success"}
@@ -142,56 +166,25 @@ export default function WaitlistModal() {
                         Cancel
                       </Button>
                       <Button
+                        type="submit"
                         disabled={state === "loading" || state === "success"}
-                        onClick={() => sendCode()}
                         className="flex-1"
                         variant="default"
                       >
-                        {state === "initial" && (
-                          <motion.span
-                            initial={{ opacity: 0, y: 5, filter: "blur(2px)" }}
-                            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                            exit="none"
-                          >
-                            Send Code
-                          </motion.span>
-                        )}
-                        {state === "loading" && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 5, filter: "blur(2px)" }}
-                            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                            exit="none"
-                          >
-                            <Spinner />
-                          </motion.div>
-                        )}
-                        {state === "success" && (
-                          <motion.span
-                            initial={{ opacity: 0, y: 5, filter: "blur(2px)" }}
-                            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                            exit="none"
-                          >
-                            Sent!
-                          </motion.span>
-                        )}
-                        {state === "error" && (
-                          <motion.span
-                            initial={{ opacity: 0, y: 5, filter: "blur(2px)" }}
-                            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                            exit="none"
-                            className="text-red-500"
-                          >
-                            Try Again
-                          </motion.span>
+                        {state === "initial" || state === "error" ? (
+                          "Send Code"
+                        ) : state === "loading" ? (
+                          <Spinner />
+                        ) : (
+                          "Sent!"
                         )}
                       </Button>
                     </div>
-                  </motion.div>
+                  </motion.form>
                 )}
               </motion.div>
             </div>
 
-            {/* footer */}
             <Image
               src="/logo-light.svg"
               alt="mascot-bottom-left"
