@@ -7,11 +7,11 @@ import { cn } from "@/lib/utils";
 import useMeasure from "@/hooks/use-measure";
 import Image from "next/image";
 import { XIcon } from "lucide-react";
-import { Checkbox } from "@radix-ui/react-checkbox";
 import { Label } from "@radix-ui/react-label";
 import Link from "next/link";
 import { Input } from "../ui/input";
 import { Spinner } from "../ui/spinner";
+import { Checkbox } from "../ui/checkbox";
 
 const STATE = ["initial", "loading", "success", "error"] as const;
 
@@ -57,6 +57,7 @@ export default function WaitlistModal() {
     <MotionConfig transition={{ type: "spring", bounce: 0, duration: 0.3 }}>
       <div className="flex items-center justify-center">
         <motion.div
+          layout
           animate={{ height }}
           className={cn(
             "relative flex w-full max-w-[500px] flex-col overflow-hidden rounded-2xl bg-black will-change-transform",
@@ -129,7 +130,7 @@ export default function WaitlistModal() {
                       />
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-start gap-3 px-2">
                       <Checkbox
                         id="agreement"
                         checked={agreed}
@@ -137,7 +138,9 @@ export default function WaitlistModal() {
                           setAgreed(checked === true)
                         }
                         disabled={state === "loading" || state === "success"}
+                        className="mt-1"
                       />
+
                       <Label
                         htmlFor="agreement"
                         className="text-gray-500 tracking-tight"
