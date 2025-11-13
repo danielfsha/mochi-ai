@@ -9,9 +9,9 @@ import Image from "next/image";
 import { XIcon } from "lucide-react";
 import { Label } from "@radix-ui/react-label";
 import Link from "next/link";
-import { Input } from "../ui/input";
 import { Spinner } from "../ui/spinner";
 import { Checkbox } from "../ui/checkbox";
+import { PhoneInput } from "../ui/phone-input";
 
 const STATE = ["initial", "loading", "success", "error"] as const;
 
@@ -23,11 +23,31 @@ export default function WaitlistModal() {
   const [phone, setPhone] = useState("");
   const [agreed, setAgreed] = useState(true);
 
+  const formatPhoneNumber = (input: string) => {
+    const digits = input.replace(/\D/g, "");
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return digits.slice(0, 3) + " " + digits.slice(3);
+    return (
+      digits.slice(0, 3) + " " + digits.slice(3, 6) + " " + digits.slice(6, 10)
+    );
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    setPhone(formatted);
+  };
+
+  const getRawNumber = () => {
+    return phone.replace(/\D/g, "");
+  };
   // Instead of sending, on submit just collapse the modal
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (phone.length < 10) {
+    getRawNumber();
+
+    // alert("Phone number submitted: " + getRawNumber());
+    if (getRawNumber().length < 10) {
       setState("error");
       alert("Please enter a valid phone number.");
       return;
@@ -121,11 +141,11 @@ export default function WaitlistModal() {
                         <span>+1</span>
                       </div>
 
-                      <Input
-                        placeholder="(212) 555-1234"
+                      <PhoneInput
+                        placeholder="212 555 1234"
                         className="flex-1 py-5 text-lg"
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        onChange={handlePhoneChange}
                         disabled={state === "loading" || state === "success"}
                       />
                     </div>
