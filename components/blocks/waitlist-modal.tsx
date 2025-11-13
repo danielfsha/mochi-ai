@@ -111,7 +111,7 @@ export default function WaitlistModal() {
                     <p>Enter your phone to get a verification code.</p>
 
                     <div className="flex items-center justify-center space-x-1 h-auto">
-                      <div className="bg-gray-100 border px-4 py-2 rounded-sm flex items-center justify-center space-x-2 h-full cursor-not-allowed">
+                      <div className="bg-gray-100 text-gray-500 border px-4 py-2 rounded-sm flex items-center justify-center space-x-2 h-full cursor-not-allowed">
                         <Image
                           src="/USA.png"
                           alt="US Flag"
@@ -171,15 +171,17 @@ export default function WaitlistModal() {
                       <Button
                         type="submit"
                         disabled={state === "loading" || state === "success"}
-                        className="flex-1"
+                        className="flex-1 overflow-hidden"
                         variant="default"
                       >
                         {state === "initial" || state === "error" ? (
-                          "Send Code"
+                          <span>Send Code</span>
                         ) : state === "loading" ? (
-                          <Spinner />
+                          <span>
+                            <Spinner />
+                          </span>
                         ) : (
-                          "Sent!"
+                          <span>Sent!</span>
                         )}
                       </Button>
                     </div>
